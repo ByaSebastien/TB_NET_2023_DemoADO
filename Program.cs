@@ -15,7 +15,7 @@ SectionRespository sectionRepo = new(connection);
 
 //Console.WriteLine(s.LastName);
 
-foreach (var item in studentRepo.GetAllWithSection().ToList())
+foreach (var item in studentRepo.GetAllWithSection())
 {
     Console.WriteLine(item.LastName);
     Console.WriteLine(item.Section?.Name);

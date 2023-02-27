@@ -16,7 +16,7 @@ namespace DemoAdo
             return connection.Query<Section>("SELECT * FROM Section");
         }
 
-        public Section GetById(int id)
+        public Section? GetById(int id)
         {
             return connection.QueryFirstOrDefault<Section>("SELECT * FROM Section WHERE Id = @Id", new { id });
         }
