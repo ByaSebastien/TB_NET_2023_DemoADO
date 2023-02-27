@@ -2,40 +2,37 @@
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
-ConfigurationBuilder builder = new ConfigurationBuilder();
+ConfigurationBuilder builder = new();
 builder.AddJsonFile("appsettings.json");
 IConfiguration configuration = builder.Build();
 
-SqlConnection connection = new SqlConnection(configuration.GetConnectionString("Main"));
+SqlConnection connection = new(configuration.GetConnectionString("Main"));
 
-StudentRepository repository = new(connection);
-SectionRespository repository2 = new(connection);
+StudentRepository studentRepo = new(connection);
+SectionRespository sectionRepo = new(connection);
 
-//repository.Add(new Student
-//{
-//    LastName = "Morre",
-//    FirstName = "Thierry",
-//    Gender = 2,
-//    BirthDate = null,
-//    IsGraduated = true,
-//});
-//if (repository.Remove(6))
-//{
-//    Console.WriteLine("Suppression OK");
-//}
+//Student? s  = studentRepo.GetById(3);
 
-//Student? student = repository.GetById(3);
-//Console.WriteLine(student.FirstName);
-//Console.WriteLine(student.LastName);
-//Console.WriteLine(student.Gender);
-//Console.WriteLine(student.BirthDate);
-//Console.WriteLine(student.IsGraduated);
+//Console.WriteLine(s.LastName);
 
-foreach (Student student in repository.GetAll())
+foreach (var item in studentRepo.GetAllWithSection().ToList())
 {
-    Console.WriteLine(student.FirstName);
-    Console.WriteLine(student.LastName);
-    Console.WriteLine(student.Gender);
-    Console.WriteLine(student.BirthDate);
-    Console.WriteLine(student.IsGraduated);
+    Console.WriteLine(item.LastName);
+    Console.WriteLine(item.Section?.Name);
 }
+
+//studentRepo.Add(new Student
+//{
+//    LastName = "Person",
+//    FirstName = "Mike",
+//    Gender = 1,
+//    IsGraduated = true
+//});
+
+
+// sectionRepo.Add(new Section { Name = ".Net" });
+// Section? s  = sectionRepo.GetById(1);
+
+// Console.WriteLine(s.Name);
+
+
