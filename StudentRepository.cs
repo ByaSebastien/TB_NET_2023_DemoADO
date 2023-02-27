@@ -1,30 +1,68 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 
 namespace DemoAdo
 {
     public class StudentRepository
     {
-        private string _connectionString = @"
-            server=(localdb)\MSSQLLocalDB;
-            database=DemoADO;
-            integrated security=true;
-            trusted_connection=true
-        ";
+        private readonly SqlConnection connection;
 
-        public List<Student> GetAll()
+        public StudentRepository(SqlConnection connection) // injection de dépendance par ctor
         {
-            return null;
+            this.connection = connection;
         }
 
-        public Student GetById(int id)
+        public IEnumerable<Student> GetAll()
         {
+            using SqlCommand command = connection.CreateCommand();
+
+            command.CommandText = "SELECT * FROM Student";
+
+            connection.Open();
+            using SqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                yield return new Student
+                {
+                    Id = (int)reader["Id"],
+                    LastName = (string)reader["LastName"],
+                    FirstName = (string)reader["FirstName"],
+                    Gender = (int)reader["Gender"],
+                    IsGraduated = (bool)reader["IsGraduated"],
+                    BirthDate = reader["BirthDate"] as DateTime?
+                };
+            }
+            connection.Close();
+        }
+
+        public Student? GetById(int id)
+        {
+            using SqlCommand command = connection.CreateCommand();
+
+            command.CommandText = "SELECT * FROM Student WHERE Id = @Id";
+            command.Parameters.AddWithValue("Id", id);
+
+            connection.Open();
+            using SqlDataReader reader = command.ExecuteReader();
+            if(reader.Read())
+            {
+                return new Student
+                {
+                    Id = (int)reader["Id"],
+                    LastName = (string)reader["LastName"],
+                    FirstName = (string)reader["FirstName"],
+                    Gender = (int)reader["Gender"],
+                    IsGraduated = (bool)reader["IsGraduated"],
+                    BirthDate = reader["BirthDate"] as DateTime?
+                };
+            }
+            connection.Close();
             return null;
         }
 
         public int Add(Student s)
         {
-            //1 chercher ou créer une connection
-            using SqlConnection connection = new SqlConnection(_connectionString);
             //2 creer une commande
             using SqlCommand command = connection.CreateCommand();
             //3 créer la requète
@@ -42,12 +80,13 @@ namespace DemoAdo
             //4 ouvrir la connection
             connection.Open();
             //5 exécuter la commande
-            return (int)command.ExecuteScalar();
+            int id = (int)command.ExecuteScalar();
+            connection.Close();
+            return id;
         }
 
         public bool Update(Student s) 
         {
-            using SqlConnection connection = new SqlConnection(_connectionString);
             using SqlCommand command = connection.CreateCommand();
 
             command.CommandText = @"
@@ -69,19 +108,22 @@ namespace DemoAdo
             command.Parameters.AddWithValue("Id", s.Id);
 
             connection.Open();
-            return command.ExecuteNonQuery() != 0;
+            bool result = command.ExecuteNonQuery() != 0;
+            connection.Close();
+            return result;
         }
 
         public bool Remove(int id) 
         { 
-            using SqlConnection connection = new SqlConnection(_connectionString);
             using SqlCommand command = connection.CreateCommand();
 
             command.CommandText = "DELETE FROM Student WHERE Id = @id";
             command.Parameters.AddWithValue("id", id);
 
             connection.Open();
-            return command.ExecuteNonQuery() != 0;
+            bool result = command.ExecuteNonQuery() != 0;
+            connection.Close();
+            return result;
         }
     }
 }
