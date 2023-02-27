@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.SqlClient;
 
 namespace DemoAdo
 {
@@ -41,7 +36,7 @@ namespace DemoAdo
             ";
             command.Parameters.AddWithValue("LastName", s.LastName);
             command.Parameters.AddWithValue("FirstName", s.FirstName);
-            command.Parameters.AddWithValue("BirthDate", s.BirthDate);
+            command.Parameters.AddWithValue("BirthDate", s.BirthDate ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("Gender", s.Gender);
             command.Parameters.AddWithValue("IsGraduated", s.IsGraduated);
             //4 ouvrir la connection
@@ -50,14 +45,43 @@ namespace DemoAdo
             return (int)command.ExecuteScalar();
         }
 
-        public void Update(Student s) 
-        { 
-        
+        public bool Update(Student s) 
+        {
+            using SqlConnection connection = new SqlConnection(_connectionString);
+            using SqlCommand command = connection.CreateCommand();
+
+            command.CommandText = @"
+                UPDATE Student
+                SET
+                LastName = @LastName,
+                FirstName = @FirstName,
+                BirthDate = @BirthDate,
+                Gender = @Gender,
+                IsGraduated = @IsGraduated
+                WHERE Id = @Id
+            ";
+
+            command.Parameters.AddWithValue("LastName", s.LastName);
+            command.Parameters.AddWithValue("FirstName", s.FirstName);
+            command.Parameters.AddWithValue("BirthDate", s.BirthDate ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("Gender", s.Gender);
+            command.Parameters.AddWithValue("IsGraduated", s.IsGraduated);
+            command.Parameters.AddWithValue("Id", s.Id);
+
+            connection.Open();
+            return command.ExecuteNonQuery() != 0;
         }
 
-        public void Remove(int id) 
+        public bool Remove(int id) 
         { 
+            using SqlConnection connection = new SqlConnection(_connectionString);
+            using SqlCommand command = connection.CreateCommand();
 
+            command.CommandText = "DELETE FROM Student WHERE Id = @id";
+            command.Parameters.AddWithValue("id", id);
+
+            connection.Open();
+            return command.ExecuteNonQuery() != 0;
         }
     }
 }

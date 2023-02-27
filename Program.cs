@@ -2,11 +2,16 @@
 
 StudentRepository repository = new();
 
-repository.Add(new Student
+repository.Update(new Student
 {
-    LastName = "LY",
-    FirstName = "Khun",
-    Gender = 2,
-    BirthDate = DateTime.Now,
-    IsGraduated = false,
+    Id = 3,
+    LastName = "Herssens",
+    FirstName = "Caroline",
+    Gender = 1,
+    BirthDate = new DateTime(1983, 02, 05),
+    IsGraduated = true,
 });
+//if(repository.Remove(2))
+//{
+//    Console.WriteLine("Suppression OK");
+//}
