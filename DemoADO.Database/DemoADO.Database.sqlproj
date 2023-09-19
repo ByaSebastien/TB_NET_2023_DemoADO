@@ -64,6 +64,6 @@
     <Build Include="Tables\Type.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Scripts\PopulateTables.sql" />
+    <PostDeploy Include="Scripts\PopulateTables.sql" />
   </ItemGroup>
 </Project>
