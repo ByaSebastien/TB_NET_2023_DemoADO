@@ -11,7 +11,8 @@ namespace DemoADO.ConsoleApp
         static string connectionString = @"server=(localdb)\MSSQLLocalDB;database=Pokemon;integrated security=true";
         static void Main(params string[] args)
         {
-            //// pour SQL Server utiliser une SqlConnection (OracleConnection, MySqlConnection, ...)
+            #region exemples
+            // pour SQL Server utiliser une SqlConnection (OracleConnection, MySqlConnection, ...)
             //using (SqlConnection connection = new SqlConnection(connectionString))
             //{
             //    // 1. ouvrir la connection
@@ -39,19 +40,20 @@ namespace DemoADO.ConsoleApp
             //    // reader.Read(); // ligne 2
 
             //    // tant que il reste des lignes à parcourir je me place sur la ligne suivante
-            //    while(reader.Read()) 
+            //    while (reader.Read())
             //    {
-            //        Console.WriteLine(reader["Name"]);
+            //        Console.WriteLine($"Nom: {reader["Name"]}");
             //        decimal poids = (decimal)reader["Weight"];
             //        double taille = (int)reader["height"];
 
             //        string? description = reader["Description"] as string;
             //        Console.WriteLine(description);
 
-            //        Console.WriteLine(poids);
-            //        Console.WriteLine(taille);
-
-            //        Console.WriteLine((double)poids / Math.Pow(taille / 100, 2));
+            //        Console.WriteLine($"Poids: {poids}");
+            //        Console.WriteLine($"Taille: {taille}");
+            //        double bmi = (double)poids / Math.Pow(taille / 100, 2);
+            //        Console.WriteLine($"BMI: {bmi}");
+            //        Console.WriteLine("------------------");
             //    }
 
             //    // récupére la première valeur que l'on va récupérer
@@ -65,7 +67,9 @@ namespace DemoADO.ConsoleApp
             //    // à la fin
             //    // connection.Close(); // facultatif car la connection est fermée qd l'objet est disposé
             //} // à la fin des accolade l'objet est automatiquement disposé
+            #endregion
 
+            #region exercice (Créer une application qui demande à l'utilisateur d'entrer les données d'un pokemon et les sauvegarder en db)
             Console.WriteLine("Entrer le numero de votre pokemon");
             int id = int.Parse(Console.ReadLine());
 
@@ -85,12 +89,15 @@ namespace DemoADO.ConsoleApp
             {
                 connection.Open();
                 SqlCommand command = connection.CreateCommand();
+
+                // ATTENTION INJECTION SQL !!!!
                 command.CommandText = @$"INSERT INTO [Pokemon]
                     (Id, [Name], [Height], [Weight], [Type1Id])
                     VALUES ({id}, '{nom}', {taille}, {poids}, {type1})";
-                command.ExecuteNonQuery();
-            }
 
+                command.ExecuteNonQuery();
+            } 
+            #endregion
         }
     }
 }

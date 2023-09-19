@@ -15,7 +15,7 @@ INSERT INTO [dbo].[Pokemon](Id, [Name], Height, [Weight], Type1Id, Type2Id)
 VALUES 
 (1, 'Bulbizarre', 70, 6.9, 3, null),
 (42, 'Nosferalto', 160, 55, 6, 7),
-(25, 'Pikachu', 160, 40, 5, null);
+(25, 'Pikachu', 40, 6, 5, null);
 
 ALTER TABLE [dbo].[Pokemon] CHECK CONSTRAINT ALL
 
