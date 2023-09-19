@@ -64,7 +64,6 @@
     <Build Include="Tables\Type.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PostDeploy Include="Scripts\PopulateTypes.sql" />
-    <None Include="Scripts\PopulatePokemon.sql" />
+    <None Include="Scripts\PopulateTables.sql" />
   </ItemGroup>
 </Project>

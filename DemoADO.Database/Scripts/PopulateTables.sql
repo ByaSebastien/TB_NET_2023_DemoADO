@@ -9,8 +9,16 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
+ALTER TABLE [dbo].[Pokemon] NOCHECK CONSTRAINT ALL
 
--- désactive l'autoincrémentation
+INSERT INTO [dbo].[Pokemon](Id, [Name], Height, [Weight], Type1Id, Type2Id)
+VALUES 
+(1, 'Bulbizarre', 70, 6.9, 3, null),
+(42, 'Nosferalto', 160, 55, 6, 7),
+(25, 'Pikachu', 160, 40, 5, null);
+
+ALTER TABLE [dbo].[Pokemon] CHECK CONSTRAINT ALL
+
 SET IDENTITY_INSERT [dbo].[Type] ON;
 
 INSERT INTO [dbo].[Type] ([Id], [Name]) VALUES
