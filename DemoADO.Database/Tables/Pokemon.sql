@@ -1,0 +1,11 @@
+﻿CREATE TABLE [dbo].[Pokemon]
+(
+	[Id] INT NOT NULL PRIMARY KEY,
+	[Name] VARCHAR(100) NOT NULL UNIQUE,
+	[Height] INT NOT NULL,
+	[Weight] DECIMAL(6, 1) NOT NULL,
+	[Description] NVARCHAR(MAX) NULL,
+	[Type1Id] INT NOT NULL REFERENCES [Type],
+	[Type2Id] INT NULL REFERENCES [Type]
+)
+
