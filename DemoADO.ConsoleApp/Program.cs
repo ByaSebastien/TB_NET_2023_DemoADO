@@ -43,26 +43,26 @@ namespace DemoADO.ConsoleApp
             //    while (reader.Read())
             //    {
             //        Console.WriteLine($"Nom: {reader["Name"]}");
-            //        decimal poids = (decimal)reader["Weight"];
-            //        double taille = (int)reader["height"];
+            //        decimal p = (decimal)reader["Weight"];
+            //        double h = (int)reader["height"];
 
             //        string? description = reader["Description"] as string;
             //        Console.WriteLine(description);
 
-            //        Console.WriteLine($"Poids: {poids}");
-            //        Console.WriteLine($"Taille: {taille}");
-            //        double bmi = (double)poids / Math.Pow(taille / 100, 2);
+            //        Console.WriteLine($"Poids: {p}");
+            //        Console.WriteLine($"Taille: {h}");
+            //        double bmi = (double)p / Math.Pow(h / 100, 2);
             //        Console.WriteLine($"BMI: {bmi}");
             //        Console.WriteLine("------------------");
             //    }
 
             //    // récupére la première valeur que l'on va récupérer
-            //    // string nb = (string)command.ExecuteScalar();
+            //    // string value = (string)command.ExecuteScalar();
 
             //    // récupére le nombre de lignes modifiées
-            //    // int nbLines = command.ExecuteNonQuery();
+            //    // int value = command.ExecuteNonQuery();
 
-            //    // Console.WriteLine(nb);
+            //    // Console.WriteLine(value);
 
             //    // à la fin
             //    // connection.Close(); // facultatif car la connection est fermée qd l'objet est disposé
