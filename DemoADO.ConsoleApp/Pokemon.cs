@@ -26,6 +26,8 @@ namespace DemoADO.ConsoleApp
         public string? Description { get; set; }
         public int Type1Id { get; set; }
         public int? Type2Id { get; set;}
+        public PokemonType Type1 { get; set; }
+        public PokemonType Type2 { get; set; }
     }
 }
 

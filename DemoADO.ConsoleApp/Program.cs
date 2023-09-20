@@ -8,6 +8,7 @@ namespace DemoADO.ConsoleApp
     {
 
         static PokemonRepository pokemonRepository = new PokemonRepository();
+        static TypeRepository typeRepository = new TypeRepository();
         
         static void Main(params string[] args)
         {
@@ -126,6 +127,11 @@ namespace DemoADO.ConsoleApp
             //    Console.WriteLine($"{pokemon.Id} : {pokemon.Nom} {pokemon.Type1Id}");
             //}
 
+            //Console.WriteLine("Quel pokemon cherchez-vous?");
+            //int id = int.Parse(Console.ReadLine());
+            //Pokemon pokemon = pokemonRepository.RecupFullPokemon(id);
+            //Console.WriteLine($"{pokemon.Id} : {pokemon.Nom} type : {pokemon.Type1.Nom}");
+
             #endregion
 
             #region Update
@@ -152,16 +158,36 @@ namespace DemoADO.ConsoleApp
 
             #region Delete
 
-            if (pokemonRepository.SupprimerPokemon(2))
-            {
-                Console.WriteLine("Ok");
-            }
-            else
-            {
-                Console.WriteLine("Ko");
-            }
+            //if (pokemonRepository.SupprimerPokemon(2))
+            //{
+            //    Console.WriteLine("Ok");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Ko");
+            //}
 
             #endregion
+
+            #region Ajout multiple
+
+            //PokemonType type1 = new PokemonType("Sol");
+            //typeRepository.Add(type1);
+            //Pokemon pokemon = new Pokemon()
+            //{
+            //    Id = 2,
+            //    Nom = "Taupiqueur",
+            //    Taille = 1,
+            //    Poids = 1,
+            //    Type1Id = type1.Id
+            //};
+            //pokemonRepository.AjouterPokemon(pokemon);
+
+            #endregion
+
+            RappelGenerique<Pokemon> p = new RappelGenerique<Pokemon>();
+            RappelGenerique<PokemonType> t = new RappelGenerique<PokemonType>();
+
         }
     }
 }

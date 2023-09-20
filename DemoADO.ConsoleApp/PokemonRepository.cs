@@ -13,6 +13,43 @@ namespace DemoADO.ConsoleApp
         // définir les informations de connection (server, database, user, password, ...)
         // string connectionString = @"server=(localdb)\MSSQLLocalDB;database=Pokemon;uid=sa;pwd=test1234";
         private string _connectionString = @"server=BSTORM\SQLEXPRESS;database=Pokemon;integrated security=true";
+
+        private static Pokemon ConvertFull(SqlDataReader reader)
+        {
+            Pokemon pokemon;
+            int Resultid = (int)reader["Id"];
+            string nom = (string)reader["Name"];
+            int taille = (int)reader["Height"];
+            decimal poids = (decimal)reader["Weight"];
+            int type1Id = (int)reader["Type1ID"];
+            int? type2Id = reader["Type2ID"] == DBNull.Value ? null : (int)reader["Type2ID"];
+            string type1Name = (string)reader["Type1Name"];
+            string? type2Name = reader["Type2Name"] == DBNull.Value ? null : (string)reader["Type2Name"];
+
+
+            pokemon = new Pokemon(Resultid, nom, taille, poids, type1Id, type2Id);
+            pokemon.Type1 = new PokemonType(type1Id, type1Name);
+            if (pokemon.Type2Id is not null)
+            {
+                pokemon.Type2 = new PokemonType(pokemon.Type2Id, type2Name);
+            }
+
+            return pokemon;
+        }
+
+        private static Pokemon Convert(SqlDataReader reader)
+        {
+            Pokemon pokemon;
+            int Resultid = (int)reader["Id"];
+            string nom = (string)reader["Name"];
+            int taille = (int)reader["Height"];
+            decimal poids = (decimal)reader["Weight"];
+            int type1 = (int)reader["Type1ID"];
+            int? type2 = reader["Type2ID"] == DBNull.Value ? null : (int)reader["Type2ID"];
+
+            pokemon = new Pokemon(Resultid, nom, taille, poids, type1, type2);
+            return pokemon;
+        }
         public void AjouterPokemon(Pokemon pokemon)
         {
             string nomTable = "pokemon";
@@ -63,14 +100,41 @@ namespace DemoADO.ConsoleApp
                 Pokemon pokemon;
                 if (reader.Read())
                 {
-                    int Resultid = (int)reader["Id"];
-                    string nom = (string)reader["Name"];
-                    int taille = (int)reader["Height"];
-                    decimal poids = (decimal)reader["Weight"];
-                    int type1 = (int)reader["Type1ID"];
-                    int? type2 = reader["Type2ID"] == DBNull.Value ? null : (int)reader["Type2ID"];
+                    pokemon = Convert(reader);
+                }
+                else
+                {
+                    throw new KeyNotFoundException();
+                }
+                connection.Close();
+                return pokemon;
+            }
+        }
 
-                    pokemon = new Pokemon(Resultid, nom, taille, poids, type1, type2);
+        public Pokemon RecupFullPokemon(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = @"SELECT 
+	                                        p.Id,
+	                                        p.Name,
+	                                        p.Height,
+	                                        p.Weight,
+	                                        p.Type1Id,
+	                                        p.Type2Id,
+	                                        t1.Name 'Type1Name',
+	                                        t2.Name 'Type2Name'
+                                        FROM Pokemon p LEFT JOIN Type t1 on t1.id = p.Type1Id
+						                                        LEFT JOIN Type t2 on t2.Id = p.Type2Id 
+                                        WHERE p.Id = @id";
+                command.Parameters.AddWithValue("@id", id);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                Pokemon pokemon;
+                if (reader.Read())
+                {
+                    pokemon = ConvertFull(reader);
                 }
                 else
                 {
