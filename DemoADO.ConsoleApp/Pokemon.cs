@@ -23,6 +23,7 @@ namespace DemoADO.ConsoleApp
         public string Nom { get; set; }
         public int Taille { get; set; }
         public decimal Poids { get; set; }
+        public string? Description { get; set; }
         public int Type1Id { get; set; }
         public int? Type2Id { get; set;}
     }
