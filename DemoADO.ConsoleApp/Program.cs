@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DemoADO.ConsoleApp
 {
@@ -8,7 +9,7 @@ namespace DemoADO.ConsoleApp
         // Data Source=(localdb)\MSSQLLocalDB;User ID=sa;Password=********;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
         // définir les informations de connection (server, database, user, password, ...)
         // string connectionString = @"server=(localdb)\MSSQLLocalDB;database=Pokemon;uid=sa;pwd=test1234";
-        static string connectionString = @"server=(localdb)\MSSQLLocalDB;database=Pokemon;integrated security=true";
+        static string connectionString = @"server=BSTORM\SQLEXPRESS;database=Pokemon;integrated security=true";
         static void Main(params string[] args)
         {
             #region exemples
@@ -70,34 +71,114 @@ namespace DemoADO.ConsoleApp
             #endregion
 
             #region exercice (Créer une application qui demande à l'utilisateur d'entrer les données d'un pokemon et les sauvegarder en db)
-            Console.WriteLine("Entrer le numero de votre pokemon");
+            //Console.WriteLine("Entrer le numero de votre pokemon");
+            //int id = int.Parse(Console.ReadLine());
+
+            //Console.WriteLine("Entrer le nom de votre pokemon");
+            //string nom = Console.ReadLine();
+
+            //Console.WriteLine("Entrer le taille de votre pokemon");
+            //int taille = int.Parse(Console.ReadLine());
+
+            //Console.WriteLine("Entrer le poids de votre pokemon");
+            //decimal poids = decimal.Parse(Console.ReadLine());
+
+            //Console.WriteLine("Entrer le type 1 de votre pokemon");
+            //int type1 = int.Parse(Console.ReadLine());
+
+            //Console.WriteLine("As-t'il un deuxième type ? (y/n)");
+            //string choix = Console.ReadLine();
+
+            //int? type2 = null;
+            //if(choix.ToLower() == "y")
+            //{
+            //    Console.WriteLine("Entrer le type 2 de votre pokemon");
+            //    type2 = int.Parse(Console.ReadLine());
+            //}
+
+
+            //Pokemon newPokemon = new Pokemon(id,nom,taille,poids,type1,type2);
+
+            //AjouterPokemon(newPokemon);
+
+
+            #endregion
+
+            #region Demo lecture Pokemon
+
+            Console.WriteLine("Quel pokemon cherchez-vous?");
             int id = int.Parse(Console.ReadLine());
+            Pokemon pokemon = RecupPokemon(id);
+            Console.WriteLine($"{pokemon.Id} : {pokemon.Nom}");
 
-            Console.WriteLine("Entrer le nom de votre pokemon");
-            string nom = Console.ReadLine();
+            #endregion
+        }
 
-            Console.WriteLine("Entrer le taille de votre pokemon");
-            int taille = int.Parse(Console.ReadLine());
-
-            Console.WriteLine("Entrer le poids de votre pokemon");
-            decimal poids = decimal.Parse(Console.ReadLine());
-
-            Console.WriteLine("Entrer le type 1 de votre pokemon");
-            int type1 = int.Parse(Console.ReadLine());
-
+        public static void AjouterPokemon(Pokemon pokemon)
+        {
+            string nomTable = "pokemon";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 SqlCommand command = connection.CreateCommand();
 
                 // ATTENTION INJECTION SQL !!!!
-                command.CommandText = @$"INSERT INTO [Pokemon]
-                    (Id, [Name], [Height], [Weight], [Type1Id])
-                    VALUES ({id}, '{nom}', {taille}, {poids}, {type1})";
+                command.CommandText = @$"INSERT INTO [{nomTable}]
+                    (Id, [Name], [Height], [Weight], [Type1Id], [Type2Id])
+                    VALUES (@id, @nom, @taille, @poids, @type1, @type2)";
 
-                command.ExecuteNonQuery();
-            } 
-            #endregion
+                //SqlParameter sqlParameter = command.CreateParameter();
+                //sqlParameter.ParameterName = "@id";
+                //sqlParameter.Value = id;
+                //command.Parameters.Add(sqlParameter);
+
+                command.Parameters.AddWithValue("@id", pokemon.Id);
+                command.Parameters.AddWithValue("@nom", pokemon.Nom);
+                command.Parameters.AddWithValue("@taille", pokemon.Taille);
+                command.Parameters.AddWithValue("@poids", pokemon.Poids);
+                command.Parameters.AddWithValue("@type1", pokemon.Type1Id);
+                command.Parameters.AddWithValue("@type2", pokemon.Type2Id is null ? DBNull.Value : pokemon.Type2Id);
+
+                int nbLignes = command.ExecuteNonQuery();
+                if (nbLignes == 1)
+                {
+                    Console.WriteLine("Succes");
+                }
+                else
+                {
+                    Console.WriteLine("Erreur");
+                }
+                connection.Close();
+            }
+        }
+        public static Pokemon RecupPokemon(int id)
+        {
+            using(SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = "SELECT * FROM POKEMON WHERE Id = @id";
+                command.Parameters.AddWithValue ("@id", id);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                Pokemon pokemon;
+                if (reader.Read())
+                {
+                    int Resultid = (int)reader["Id"];
+                    string nom = (string)reader["Name"];
+                    int taille = (int)reader["Height"];
+                    decimal poids = (decimal)reader["Weight"];
+                    int type1 = (int)reader["Type1ID"];
+                    int? type2 = reader["Type2ID"] == DBNull.Value ? null : (int)reader["Type2ID"];
+
+                    pokemon = new Pokemon(Resultid,nom,taille,poids,type1,type2);
+                }
+                else
+                {
+                    throw new KeyNotFoundException();
+                }
+                connection.Close();
+                return pokemon;
+            }
         }
     }
 }

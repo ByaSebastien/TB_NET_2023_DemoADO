@@ -66,4 +66,7 @@
   <ItemGroup>
     <PostDeploy Include="Scripts\PopulateTables.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DemoADO.Database.publish.xml" />
+  </ItemGroup>
 </Project>
