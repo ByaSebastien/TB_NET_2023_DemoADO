@@ -7,14 +7,11 @@ using System.Threading.Tasks;
 
 namespace DemoADO.ConsoleApp
 {
-    public class PokemonRepository
+    public class PokemonRepository : BaseRepository<int, Pokemon>
     {
-        // Data Source=(localdb)\MSSQLLocalDB;User ID=sa;Password=********;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
-        // définir les informations de connection (server, database, user, password, ...)
-        // string connectionString = @"server=(localdb)\MSSQLLocalDB;database=Pokemon;uid=sa;pwd=test1234";
-        private string _connectionString = @"server=BSTORM\SQLEXPRESS;database=Pokemon;integrated security=true";
+        public PokemonRepository() : base("Pokemon", "Id") { }
 
-        private static Pokemon ConvertFull(SqlDataReader reader)
+        private Pokemon ConvertFull(SqlDataReader reader)
         {
             Pokemon pokemon;
             int Resultid = (int)reader["Id"];
@@ -37,7 +34,7 @@ namespace DemoADO.ConsoleApp
             return pokemon;
         }
 
-        private static Pokemon Convert(SqlDataReader reader)
+        protected override Pokemon Convert(SqlDataReader reader)
         {
             Pokemon pokemon;
             int Resultid = (int)reader["Id"];
@@ -50,7 +47,7 @@ namespace DemoADO.ConsoleApp
             pokemon = new Pokemon(Resultid, nom, taille, poids, type1, type2);
             return pokemon;
         }
-        public void AjouterPokemon(Pokemon pokemon)
+        public override void Add(Pokemon pokemon)
         {
             string nomTable = "pokemon";
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -88,29 +85,6 @@ namespace DemoADO.ConsoleApp
             }
         }
 
-        public Pokemon RecupPokemon(int id)
-        {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = connection.CreateCommand();
-                command.CommandText = "SELECT * FROM POKEMON WHERE Id = @id";
-                command.Parameters.AddWithValue("@id", id);
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                Pokemon pokemon;
-                if (reader.Read())
-                {
-                    pokemon = Convert(reader);
-                }
-                else
-                {
-                    throw new KeyNotFoundException();
-                }
-                connection.Close();
-                return pokemon;
-            }
-        }
-
         public Pokemon RecupFullPokemon(int id)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -145,32 +119,7 @@ namespace DemoADO.ConsoleApp
             }
         }
 
-        public List<Pokemon> RecupPokemons()
-        {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = connection.CreateCommand();
-                command.CommandText = "SELECT * FROM POKEMON";
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                List<Pokemon> pokemons = new List<Pokemon>();
-                while (reader.Read())
-                {
-                    int Resultid = (int)reader["Id"];
-                    string nom = (string)reader["Name"];
-                    int taille = (int)reader["Height"];
-                    decimal poids = (decimal)reader["Weight"];
-                    int type1 = (int)reader["Type1ID"];
-                    int? type2 = reader["Type2ID"] == DBNull.Value ? null : (int)reader["Type2ID"];
-
-                    pokemons.Add(new Pokemon(Resultid, nom, taille, poids, type1, type2));
-                }
-                connection.Close();
-                return pokemons;
-            }
-        }
-
-        public bool ModifierPokemon(int id, Pokemon pokemon)
+        public override bool Update(int id, Pokemon pokemon)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -205,20 +154,6 @@ namespace DemoADO.ConsoleApp
                 //    return false;
                 //}
 
-                return nbLignes == 1;
-            }
-        }
-
-        public bool SupprimerPokemon(int id)
-        {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                SqlCommand command = connection.CreateCommand();
-                command.CommandText = "DELETE Pokemon WHERE Id = @id";
-                command.Parameters.AddWithValue("@id", id);
-                connection.Open();
-                int nbLignes = command.ExecuteNonQuery();
-                connection.Close();
                 return nbLignes == 1;
             }
         }

@@ -185,9 +185,33 @@ namespace DemoADO.ConsoleApp
 
             #endregion
 
-            RappelGenerique<Pokemon> p = new RappelGenerique<Pokemon>();
-            RappelGenerique<PokemonType> t = new RappelGenerique<PokemonType>();
+            
+            Pokemon pokemon = new Pokemon()
+            {
+                Id = 4,
+                Nom = "Arcanin",
+                Taille = 5,
+                Poids = 6,
+                Type1Id = 2,
+            };
 
+            pokemonRepository.Add(pokemon);
+
+            List<Pokemon> pokemons = pokemonRepository.GetAll().ToList();
+
+            foreach(Pokemon p in  pokemons)
+            {
+                Console.WriteLine($"{p.Id} : {p.Nom}");
+            }
+
+            pokemonRepository.Delete(2);
+
+            pokemons = pokemonRepository.GetAll().ToList();
+
+            foreach (Pokemon p in pokemons)
+            {
+                Console.WriteLine($"{p.Id} : {p.Nom}");
+            }
         }
     }
 }

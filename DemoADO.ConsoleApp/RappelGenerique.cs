@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DemoADO.ConsoleApp
 {
-    public class RappelGenerique<T>
+    public class RappelGenerique<T> where T : class
     {
         public void Afficher(T entity)
         {

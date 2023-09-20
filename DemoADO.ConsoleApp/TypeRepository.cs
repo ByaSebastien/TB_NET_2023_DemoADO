@@ -7,11 +7,20 @@ using System.Threading.Tasks;
 
 namespace DemoADO.ConsoleApp
 {
-    public class TypeRepository
+    public class TypeRepository : BaseRepository<int,PokemonType>
     {
-        private string _connectionString = @"server=BSTORM\SQLEXPRESS;database=Pokemon;integrated security=true";
+        public TypeRepository() : base("Type", "Id") { }
 
-        public void Add(PokemonType type)
+        protected override PokemonType Convert(SqlDataReader reader)
+        {
+            return new PokemonType()
+            {
+                Id = (int)reader["Id"],
+                Nom = (string)reader["Name"]
+            };
+        }
+
+        public override void Add(PokemonType type)
         {
             using(SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -31,6 +40,26 @@ namespace DemoADO.ConsoleApp
                     type.Id = typeId ?? 0;
                 }
                 connection.Close();
+            }
+        }
+
+        public override bool Update(int id, PokemonType type)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "UPDATE Type " +
+                                  "SET Name = @name " +
+                                  "WHERE Id = @id";
+                cmd.Parameters.AddWithValue("@nom", type.Nom);
+                cmd.Parameters.AddWithValue("@id", id);
+                connection.Open();
+                
+                int nbLignes = cmd.ExecuteNonQuery();
+
+                connection.Close();
+
+                return nbLignes == 1;
             }
         }
     }
